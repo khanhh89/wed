@@ -60,7 +60,7 @@
           <label class="form-label">Tải ảnh xác nhận thanh toán</label>
           <input type="file" class="form-control" id="invoiceUpload" accept="image/*">
           <img id="previewImg" />
-          <button type="button" id="checkBtn" class="btn btn-warning mt-2">🔍 Kiểm tra ảnh</button>
+          <button type="button" id="checkBtn" class="btn btn-warning mt-2">🔍 Check</button>
           <div id="checkStatus"></div>
         </div>
 
@@ -105,7 +105,7 @@
         imageBase64 = e.target.result;
         document.getElementById("previewImg").src = imageBase64;
         document.getElementById("previewImg").style.display = "block";
-        document.getElementById("checkStatus").innerText = "Ảnh đã tải lên. Bấm \"Kiểm tra ảnh\" để xác minh.";
+        document.getElementById("checkStatus").innerText = "Ảnh đã tải lên. Bấm \"Check\" để xác minh.";
       };
       reader.readAsDataURL(file);
     });
@@ -116,7 +116,7 @@
       const note = document.getElementById("note").innerText;
       const amount = document.getElementById("amount").innerText;
 
-      document.getElementById("checkStatus").innerText = "Đang kiểm tra ảnh... ⏳";
+      document.getElementById("checkStatus").innerText = "Đang kiểm tra... ⏳";
 
       handleBillVerification(
         imageBase64,
@@ -133,9 +133,8 @@
       );
     });
 
-    // Tích hợp OCR trực tiếp tại đây
     const OCR_API_URL = "https://api.ocr.space/parse/image";
-    const OCR_API_KEY = "helloworld"; // thay bằng API key thật nếu cần
+    const OCR_API_KEY = "helloworld";
 
     async function extractTextFromImage(base64Image) {
       const formData = new FormData();
@@ -150,13 +149,12 @@
         body: formData
       });
       const result = await res.json();
-      const parsedText = result?.ParsedResults?.[0]?.ParsedText || "";
-      return parsedText;
+      return result?.ParsedResults?.[0]?.ParsedText || "";
     }
 
     function findNAPCodeAndAmount(text) {
       const napMatch = text.match(/NAP\d{3,6}/i);
-      const moneyMatch = text.match(/([1-9]\d{2,})(\.000)? ?(VN[DĐ])/i);
+      const moneyMatch = text.match(/(1[0]{4,5}|[1-9]\d{3,6})[\.,]?(000)?( ?[VvNnDdĐđ])?/);
       return {
         napCode: napMatch ? napMatch[0].toUpperCase() : null,
         amount: moneyMatch ? parseInt(moneyMatch[1].replace(/\D/g, '')) : null
@@ -167,8 +165,6 @@
       try {
         const extractedText = await extractTextFromImage(imageBase64);
         const { napCode, amount } = findNAPCodeAndAmount(extractedText);
-        console.log("[OCR text]", extractedText);
-        console.log("[Tìm thấy]", napCode, amount);
         const expectedAmountNum = parseInt(expectedAmount.replace(/\D/g, ''));
         if (napCode === expectedNote && amount === expectedAmountNum) {
           onSuccess();
@@ -176,7 +172,6 @@
           onError("Mã hoặc số tiền không khớp! Tìm thấy: " + napCode + " | " + amount);
         }
       } catch (err) {
-        console.error("OCR ERROR:", err);
         onError("Lỗi kết nối hoặc xử lý ảnh!");
       }
     }
