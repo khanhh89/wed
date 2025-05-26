@@ -129,7 +129,7 @@
     }
 
     function findAmount(text) {
-      const match = text.match(/\d{1,3}(?:[\.\,\s]\d{3})+/);
+      const match = text.match(/(\d{1,3}(?:[.,\s]\d{3})+|\d{5,})/);
       return match ? match[0].replace(/\D/g, '') : null;
     }
 
@@ -160,7 +160,7 @@
         const foundAmount = findAmount(text);
 
         const matchedNote = foundNote?.includes(note);
-        const matchedAmount = foundAmount?.endsWith(rawAmount);
+        const matchedAmount = foundAmount === rawAmount;
 
         if (matchedNote && matchedAmount) {
           document.getElementById("checkStatus").innerText = "✅ Giao dịch hợp lệ!";
