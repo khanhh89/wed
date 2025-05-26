@@ -1,67 +1,117 @@
-<script>
-  let transferCounter = 1001;
-  const KEY_API_BASE = "https://script.google.com/macros/s/AKfycbz9koZ1y6faFiU7pVXJ43FHEPYn_A1Ek8A0T7MsCoMiAO-lhoLMMwb0MndlYlMhc9CP/exec";
-
-  const sheetMap = {
-    "1d": "key24h",
-    "7d": "key7day",
-    "30d": "key30day"
-  };
-
-  function copyToClipboard(text) {
-    navigator.clipboard.writeText(text).then(() => alert("Đã copy: " + text));
-  }
-
-  function confirmPayment() {
-    const duration = document.querySelector("select[name='duration']").value;
-    const sheet = sheetMap[duration];
-    if (!sheet) {
-      alert("Không xác định được thời hạn.");
-      return;
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>SHOP KEY ONLINE</title>
+  <link href="https://fonts.googleapis.com/css2?family=Roboto:wght@400;700&display=swap" rel="stylesheet" />
+  <style>
+    body {
+      margin: 0;
+      font-family: 'Roboto', sans-serif;
+      background: #f8f9fa;
+      color: #333;
     }
+    header {
+      background-color: #343a40;
+      color: white;
+      padding: 20px 0;
+      text-align: center;
+    }
+    header h1 {
+      margin: 0;
+      font-size: 2.5em;
+    }
+    nav {
+      background-color: #495057;
+      display: flex;
+      justify-content: center;
+      gap: 30px;
+      padding: 10px 0;
+    }
+    nav a {
+      color: white;
+      text-decoration: none;
+      font-weight: bold;
+    }
+    nav a:hover {
+      text-decoration: underline;
+    }
+    .hero {
+      padding: 60px 20px;
+      text-align: center;
+      background-color: #e9ecef;
+    }
+    .hero h2 {
+      font-size: 2em;
+      margin-bottom: 10px;
+    }
+    .hero p {
+      font-size: 1.2em;
+      color: #555;
+    }
+    .features {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+      gap: 20px;
+      padding: 40px 20px;
+      background: white;
+    }
+    .feature {
+      background-color: #ffffff;
+      border: 1px solid #ddd;
+      border-radius: 8px;
+      padding: 20px;
+      text-align: center;
+      box-shadow: 0 4px 8px rgba(0,0,0,0.05);
+    }
+    .feature h3 {
+      margin-top: 0;
+    }
+    footer {
+      background-color: #343a40;
+      color: white;
+      text-align: center;
+      padding: 15px;
+    }
+  </style>
+</head>
+<body>
 
-    fetch(`${KEY_API_BASE}?sheet=${sheet}`)
-      .then(res => res.text())
-      .then(key => {
-        document.getElementById("userKey").innerText = key;
-        document.getElementById("keySection").style.display = "block";
-      })
-      .catch(err => alert("Lỗi lấy key: " + err));
-  }
+  <header>
+    <h1>SHOP KEY ONLINE</h1>
+    <p>Mua key tự động - Giá rẻ - Uy tín</p>
+  </header>
 
-  document.getElementById("invoiceUpload").addEventListener("change", function(event) {
-    const file = event.target.files[0];
-    const reader = new FileReader();
-    reader.onload = function(e) {
-      const preview = document.getElementById("previewImg");
-      preview.src = e.target.result;
-      preview.style.display = "block";
-    };
-    if (file) reader.readAsDataURL(file);
-  });
+  <nav>
+    <a href="#">Trang chủ</a>
+    <a href="#">Danh sách key</a>
+    <a href="#">Liên hệ</a>
+  </nav>
 
-  document.getElementById("orderForm").addEventListener("submit", function(e) {
-    e.preventDefault();
-    const form = new FormData(e.target);
-    const game = form.get("game");
-    const duration = form.get("duration");
+  <section class="hero">
+    <h2>Chào mừng đến với SHOP KEY</h2>
+    <p>Chúng tôi cung cấp key game, phần mềm bản quyền với giá tốt nhất</p>
+  </section>
 
-    const gameMap = {
-      "lienquan": "Liên Quân Mobile",
-      "pubg": "PUBG Mobile",
-      "playtogether": "Play Together VNG"
-    };
+  <section class="features">
+    <div class="feature">
+      <h3>🕹️ Key game hot</h3>
+      <p>Liên Quân, PUBG Mobile, Play Together VNG,...</p>
+    </div>
+    <div class="feature">
+      <h3>🔐 Key bản quyền</h3>
+      <p>Windows, Office, phần mềm diệt virus,...</p>
+    </div>
+    <div class="feature">
+      <h3>⚡ Giao hàng tự động</h3>
+      <p>Nhận key ngay sau khi thanh toán qua ZaloPay, Momo, ViettelPay</p>
+    </div>
+  </section>
 
-    const durationMap = {
-      "1d": "1 ngày",
-      "7d": "7 ngày",
-      "30d": "30 ngày"
-    };
+  <footer>
+    <p>&copy; 2025 SHOP KEY ONLINE. Được thiết kế bởi bạn.</p>
+  </footer>
 
-    transferCounter++;
-    document.getElementById("summaryProduct").innerText = `${durationMap[duration]} | ${gameMap[game]}`;
-    document.getElementById("transferNote").innerText = "NAP" + transferCounter;
-    document.getElementById("paymentInfo").style.display = "block";
-    window.scrollTo({ top: document.body.scrollHeight, behavior: "smooth" });
-  });
-</script>
+</body>
+</html>
