@@ -15,6 +15,7 @@
     #previewImg { max-width: 100%; max-height: 200px; border: 1px solid #333; margin-top: 10px; display: none; }
     #copyBtn, .copy-btn { margin-left: 10px; font-size: 14px; }
     .alert-success strong { font-size: 18px; }
+    #checkStatus { margin-top: 10px; font-style: italic; color: #ccc; }
   </style>
 </head>
 <body>
@@ -59,7 +60,10 @@
           <label class="form-label">Tải ảnh xác nhận thanh toán</label>
           <input type="file" class="form-control" id="invoiceUpload" accept="image/*">
           <img id="previewImg" />
+          <button type="button" id="checkBtn" class="btn btn-warning mt-2">🔍 Kiểm tra ảnh</button>
+          <div id="checkStatus"></div>
         </div>
+
         <button type="submit" id="submitBtn" class="btn btn-primary w-100" disabled>Tôi đã thanh toán</button>
       </div>
     </form>
@@ -70,7 +74,7 @@
     const priceMap = { "1day": "10.000 VNĐ", "7day": "35.000 VNĐ", "30day": "150.000 VNĐ" };
     const durationText = { "1day": "1 ngày", "7day": "7 ngày", "30day": "30 ngày" };
     let counter = 1001;
-    let keyReceived = false;
+    let imageBase64 = null;
 
     function copyText(text) {
       navigator.clipboard.writeText(text).then(() => alert("Đã sao chép: " + text));
@@ -98,27 +102,37 @@
 
       const reader = new FileReader();
       reader.onload = function(e) {
-        document.getElementById("previewImg").src = e.target.result;
+        imageBase64 = e.target.result;
+        document.getElementById("previewImg").src = imageBase64;
         document.getElementById("previewImg").style.display = "block";
-
-        // ✅ Gọi OCR kiểm tra đúng mã + số tiền
-        const note = document.getElementById("note").innerText;
-        const amount = document.getElementById("amount").innerText;
-
-        handleBillVerification(
-          e.target.result,
-          note,
-          amount,
-          () => document.getElementById("submitBtn").disabled = false,
-          (err) => {
-            alert(err);
-            document.getElementById("submitBtn").disabled = true;
-          }
-        );
+        document.getElementById("checkStatus").innerText = "Ảnh đã tải lên. Bấm \"Kiểm tra ảnh\" để xác minh.";
       };
       reader.readAsDataURL(file);
     });
+
+    document.getElementById("checkBtn").addEventListener("click", () => {
+      if (!imageBase64) return alert("Vui lòng tải ảnh hóa đơn trước!");
+
+      const note = document.getElementById("note").innerText;
+      const amount = document.getElementById("amount").innerText;
+
+      document.getElementById("checkStatus").innerText = "Đang kiểm tra ảnh... ⏳";
+
+      handleBillVerification(
+        imageBase64,
+        note,
+        amount,
+        () => {
+          document.getElementById("checkStatus").innerText = "✅ Ảnh hợp lệ! Bạn có thể xác nhận thanh toán.";
+          document.getElementById("submitBtn").disabled = false;
+        },
+        (err) => {
+          document.getElementById("checkStatus").innerText = "❌ " + err;
+          document.getElementById("submitBtn").disabled = true;
+        }
+      );
+    });
   </script>
-  <script src="ocr.js"></script> <!-- chứa các hàm extractTextFromImage, findNAPCodeAndAmount, handleBillVerification -->
+  <script src="ocr.js"></script>
 </body>
 </html>
