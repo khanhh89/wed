@@ -159,7 +159,10 @@
         const foundNote = findNAPCode(text);
         const foundAmount = findAmount(text);
 
-        if (foundNote === note && foundAmount === rawAmount) {
+        const matchedNote = (foundNote || "").toUpperCase().includes(note.toUpperCase());
+        const matchedAmount = (foundAmount || "").includes(rawAmount);
+
+        if (matchedNote && matchedAmount) {
           document.getElementById("checkStatus").innerText = "✅ Giao dịch hợp lệ!";
           document.getElementById("submitBtn").disabled = false;
           sendToTelegram(note, amount, document.getElementById("product").innerText, imageBase64);
