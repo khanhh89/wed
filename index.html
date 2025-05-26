@@ -1,117 +1,169 @@
 <!DOCTYPE html>
 <html lang="vi">
 <head>
-  <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>SHOP KEY ONLINE</title>
-  <link href="https://fonts.googleapis.com/css2?family=Roboto:wght@400;700&display=swap" rel="stylesheet" />
+  <meta charset="UTF-8">
+  <title>Hack Game Store</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+  <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css" rel="stylesheet">
   <style>
     body {
-      margin: 0;
-      font-family: 'Roboto', sans-serif;
-      background: #f8f9fa;
-      color: #333;
+      background-color: #121212;
+      color: #f1f1f1;
+      font-family: 'Segoe UI', sans-serif;
     }
-    header {
-      background-color: #343a40;
-      color: white;
-      padding: 20px 0;
-      text-align: center;
+    .form-control, .form-select {
+      background-color: #1e1e1e;
+      color: #fff;
+      border: 1px solid #444;
     }
-    header h1 {
-      margin: 0;
-      font-size: 2.5em;
+    .btn-primary {
+      background: linear-gradient(90deg, #8e2de2, #4a00e0);
+      border: none;
     }
-    nav {
-      background-color: #495057;
-      display: flex;
-      justify-content: center;
-      gap: 30px;
-      padding: 10px 0;
-    }
-    nav a {
-      color: white;
-      text-decoration: none;
-      font-weight: bold;
-    }
-    nav a:hover {
-      text-decoration: underline;
-    }
-    .hero {
-      padding: 60px 20px;
-      text-align: center;
-      background-color: #e9ecef;
-    }
-    .hero h2 {
-      font-size: 2em;
-      margin-bottom: 10px;
-    }
-    .hero p {
-      font-size: 1.2em;
-      color: #555;
-    }
-    .features {
-      display: grid;
-      grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
-      gap: 20px;
-      padding: 40px 20px;
-      background: white;
-    }
-    .feature {
-      background-color: #ffffff;
-      border: 1px solid #ddd;
-      border-radius: 8px;
-      padding: 20px;
-      text-align: center;
-      box-shadow: 0 4px 8px rgba(0,0,0,0.05);
-    }
-    .feature h3 {
-      margin-top: 0;
-    }
-    footer {
-      background-color: #343a40;
-      color: white;
-      text-align: center;
+    .key-box {
+      background-color: #222;
       padding: 15px;
+      border-radius: 10px;
+      border: 1px solid #555;
+    }
+    .copy-btn {
+      background: none;
+      border: none;
+      color: #0f0;
+      margin-left: 10px;
+      cursor: pointer;
+    }
+    #previewImg {
+      max-width: 100%;
+      max-height: 200px;
+      border: 1px solid #333;
+      margin-top: 10px;
+      display: none;
     }
   </style>
 </head>
 <body>
 
-  <header>
-    <h1>SHOP KEY ONLINE</h1>
-    <p>Mua key tự động - Giá rẻ - Uy tín</p>
-  </header>
+<div class="container py-5">
+  <div class="text-center mb-5">
+    <h1><i class="fa-solid fa-gamepad"></i> Hack Game Store</h1>
+    <p class="text-muted">Thuê hack an toàn - bảo mật - chất lượng cao</p>
+  </div>
 
-  <nav>
-    <a href="#">Trang chủ</a>
-    <a href="#">Danh sách key</a>
-    <a href="#">Liên hệ</a>
-  </nav>
+  <div id="orderSection">
+    <h3><i class="fa-solid fa-cart-shopping"></i> Đặt hàng</h3>
+    <form id="orderForm">
+      <div class="mb-3">
+        <label class="form-label">Chọn game</label>
+        <select class="form-select" name="game" required>
+          <option value="">-- Chọn game --</option>
+          <option value="lienquan">Liên Quân Mobile</option>
+          <option value="pubg">PUBG Mobile</option>
+          <option value="playtogether">Play Together VNG</option>
+        </select>
+      </div>
 
-  <section class="hero">
-    <h2>Chào mừng đến với SHOP KEY</h2>
-    <p>Chúng tôi cung cấp key game, phần mềm bản quyền với giá tốt nhất</p>
-  </section>
+      <div class="mb-3">
+        <label class="form-label">Thời hạn thuê</label>
+        <select class="form-select" name="duration" required>
+          <option value="">-- Chọn thời hạn --</option>
+          <option value="24h">24h</option>
+          <option value="7day">7 ngày</option>
+          <option value="30day">30 ngày</option>
+        </select>
+      </div>
 
-  <section class="features">
-    <div class="feature">
-      <h3>🕹️ Key game hot</h3>
-      <p>Liên Quân, PUBG Mobile, Play Together VNG,...</p>
+      <div class="mb-3">
+        <label class="form-label">Mã giảm giá (nếu có)</label>
+        <input type="text" class="form-control" name="discountCode" placeholder="Nhập mã">
+      </div>
+
+      <button class="btn btn-primary" type="submit">Tiếp tục thanh toán</button>
+    </form>
+  </div>
+
+  <div class="payment-info mt-5" id="paymentInfo" style="display:none;">
+    <hr>
+    <h4><i class="fa-solid fa-money-check-dollar"></i> Thanh toán</h4>
+    <p><strong>💳 Chủ TK:</strong> HOANG QUOC VIET</p>
+    <p><strong>🏦 Số TK:</strong> 07000021112004 
+      <button class="copy-btn" onclick="copyToClipboard('07000021112004')">Copy</button>
+    </p>
+    <p><strong>💰 Số tiền:</strong> 1.000 VNĐ</p>
+    <p><strong>📝 Nội dung:</strong> <span id="transferNote">NAP1001</span>
+      <button class="copy-btn" onclick="copyToClipboard(document.getElementById('transferNote').innerText)">Copy</button>
+    </p>
+    <p><strong>🛒 Sản phẩm:</strong> <span id="summaryProduct"></span></p>
+
+    <div class="mb-3 mt-3">
+      <label class="form-label">🖼️ Upload hóa đơn thanh toán:</label>
+      <input type="file" class="form-control" id="invoiceUpload" accept="image/*">
+      <img id="previewImg" />
     </div>
-    <div class="feature">
-      <h3>🔐 Key bản quyền</h3>
-      <p>Windows, Office, phần mềm diệt virus,...</p>
-    </div>
-    <div class="feature">
-      <h3>⚡ Giao hàng tự động</h3>
-      <p>Nhận key ngay sau khi thanh toán qua ZaloPay, Momo, ViettelPay</p>
-    </div>
-  </section>
 
-  <footer>
-    <p>&copy; 2025 SHOP KEY ONLINE. Được thiết kế bởi bạn.</p>
-  </footer>
+    <button class="btn btn-success mt-3" onclick="confirmPayment()">Tôi đã thanh toán</button>
+
+    <div id="keySection" class="key-box mt-4" style="display:none;">
+      <strong>🎁 KEY của bạn:</strong> <span class="text-success" id="userKey"></span>
+    </div>
+  </div>
+</div>
+
+<script>
+  let transferCounter = 1001;
+  const KEY_API_URL = "https://script.google.com/macros/s/AKfycbz9koZ1y6faFiU7pVXJ43FHEPYn_A1Ek8A0T7MsCoMiAO-lhoLMMwb0MndlYlMhc9CP/exec";
+
+  function copyToClipboard(text) {
+    navigator.clipboard.writeText(text).then(() => alert("Đã copy: " + text));
+  }
+
+  function confirmPayment() {
+    fetch(KEY_API_URL)
+      .then(res => res.text())
+      .then(key => {
+        document.getElementById("userKey").innerText = key;
+        document.getElementById("keySection").style.display = "block";
+      })
+      .catch(err => alert("Lỗi lấy key: " + err));
+  }
+
+  document.getElementById("invoiceUpload").addEventListener("change", function(event) {
+    const file = event.target.files[0];
+    const reader = new FileReader();
+    reader.onload = function(e) {
+      const preview = document.getElementById("previewImg");
+      preview.src = e.target.result;
+      preview.style.display = "block";
+    };
+    if (file) reader.readAsDataURL(file);
+  });
+
+  document.getElementById("orderForm").addEventListener("submit", function(e) {
+    e.preventDefault();
+    const form = new FormData(e.target);
+    const game = form.get("game");
+    const duration = form.get("duration");
+
+    const gameMap = {
+      "lienquan": "Liên Quân Mobile",
+      "pubg": "PUBG Mobile",
+      "playtogether": "Play Together VNG"
+    };
+
+    const durationMap = {
+      "24h": "24h",
+      "7day": "7 ngày",
+      "30day": "30 ngày"
+    };
+
+    transferCounter++;
+    document.getElementById("summaryProduct").innerText = `${durationMap[duration]} | ${gameMap[game]}`;
+    document.getElementById("transferNote").innerText = "NAP" + transferCounter;
+    document.getElementById("paymentInfo").style.display = "block";
+    window.scrollTo({ top: document.body.scrollHeight, behavior: "smooth" });
+  });
+</script>
 
 </body>
 </html>
