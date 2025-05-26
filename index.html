@@ -71,7 +71,7 @@
   </div>
 
   <script>
-    const priceMap = { "1day": "10.000 VNĐ", "7day": "35.000 VNĐ", "30day": "150.000 VNĐ" };
+    const priceMap = { "1day": "10000", "7day": "35000", "30day": "150000" };
     const durationText = { "1day": "1 ngày", "7day": "7 ngày", "30day": "30 ngày" };
     let imageBase64 = null;
 
@@ -90,7 +90,7 @@
 
       document.getElementById("note").innerText = note;
       document.getElementById("product").innerText = product;
-      document.getElementById("amount").innerText = amount;
+      document.getElementById("amount").innerText = parseInt(amount).toLocaleString('vi-VN') + ' VNĐ';
       document.getElementById("paymentBox").style.display = "block";
     });
 
@@ -149,8 +149,8 @@
       if (!imageBase64) return alert("Vui lòng tải ảnh hóa đơn.");
 
       const note = document.getElementById("note").innerText;
-      const amount = document.getElementById("amount").innerText;
-      const rawAmount = amount.replace(/\D/g, "");
+      const amountText = document.getElementById("amount").innerText;
+      const rawAmount = amountText.replace(/\D/g, "");
 
       document.getElementById("checkStatus").innerText = "🔄 Đang kiểm tra...";
 
@@ -159,13 +159,13 @@
         const foundNote = findNAPCode(text);
         const foundAmount = findAmount(text);
 
-        const matchedNote = (foundNote || "").toUpperCase().includes(note.toUpperCase());
-        const matchedAmount = (foundAmount || "").includes(rawAmount);
+        const matchedNote = foundNote?.includes(note);
+        const matchedAmount = foundAmount?.endsWith(rawAmount);
 
         if (matchedNote && matchedAmount) {
           document.getElementById("checkStatus").innerText = "✅ Giao dịch hợp lệ!";
           document.getElementById("submitBtn").disabled = false;
-          sendToTelegram(note, amount, document.getElementById("product").innerText, imageBase64);
+          sendToTelegram(note, rawAmount, document.getElementById("product").innerText, imageBase64);
         } else {
           document.getElementById("checkStatus").innerText = `❌ Không khớp! Tìm thấy: ${foundNote || 'Không có'} | ${foundAmount || 'Không có'}`;
         }
