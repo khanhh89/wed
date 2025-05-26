@@ -1,112 +1,97 @@
 <!DOCTYPE html>
 <html lang="vi">
 <head>
-  <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <meta charset="UTF-8">
   <title>Mua Key Hack Game</title>
-  <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet"/>
+  <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
 </head>
-<body class="bg-light">
-  <div class="container py-5">
-    <h1 class="text-center mb-4">Mua Key Hack Game</h1>
-    <form id="orderForm" class="bg-white p-4 rounded shadow-sm">
-      <div class="mb-3">
-        <label for="game" class="form-label">Chọn game</label>
-        <select name="game" id="game" class="form-select" required>
-          <option value="lienquan">Liên Quân Mobile</option>
-          <option value="pubg">PUBG Mobile</option>
-          <option value="playtogether">Play Together VNG</option>
-        </select>
-      </div>
-      <div class="mb-3">
-        <label for="duration" class="form-label">Chọn thời hạn key</label>
-        <select name="duration" id="duration" class="form-select" required>
-          <option value="24h">24h - 10.000đ</option>
-          <option value="7day">7 ngày - 35.000đ</option>
-          <option value="30day">30 ngày - 150.000đ</option>
-        </select>
-      </div>
-      <div class="mb-3">
-        <label for="proof" class="form-label">Tải ảnh xác nhận chuyển khoản</label>
-        <input type="file" name="proof" id="proof" class="form-control" required />
-      </div>
-      <button type="submit" class="btn btn-primary w-100">Xác nhận thanh toán</button>
-    </form>
-
-    <div id="paymentInfo" class="mt-4 d-none">
-      <div class="card p-3">
-        <h5>Thông tin chuyển khoản</h5>
-        <div class="payment-info">
-          <p><strong>Sản phẩm:</strong> <span id="summaryProduct"></span></p>
-          <p><strong>STK:</strong> 999999999999999</p>
-          <p><strong>Số tiền:</strong> <span id="summaryPrice"></span> VNĐ</p>
-          <p><strong>Nội dung chuyển khoản:</strong> <span id="transferNote"></span></p>
-        </div>
-        <button id="getKeyBtn" class="btn btn-success mt-3">Lấy Key</button>
-      </div>
+<body>
+<div class="container mt-5">
+  <h2 class="text-center mb-4">Mua Key Hack Game</h2>
+  <form id="orderForm">
+    <div class="mb-3">
+      <label class="form-label">Chọn game:</label>
+      <select class="form-select" id="game">
+        <option value="Liên Quân">Liên Quân Mobile</option>
+        <option value="PUBG">PUBG Mobile</option>
+        <option value="PlayTogether">Play Together VNG</option>
+      </select>
     </div>
+    <div class="mb-3">
+      <label class="form-label">Chọn thời hạn:</label>
+      <select class="form-select" id="duration">
+        <option value="24h">24h - 10.000đ</option>
+        <option value="7day">7 ngày - 35.000đ</option>
+        <option value="30day">30 ngày - 150.000đ</option>
+      </select>
+    </div>
+    <div class="mb-3">
+      <label class="form-label">Tải ảnh chuyển khoản:</label>
+      <input type="file" class="form-control" id="proof" required>
+    </div>
+    <button type="submit" class="btn btn-primary">Xác nhận thanh toán</button>
+  </form>
 
-    <div id="keyResult" class="alert alert-info mt-4 d-none text-center"></div>
+  <div class="mt-4 d-none" id="paymentSection">
+    <h4>Thông tin chuyển khoản</h4>
+    <p><strong>Sản phẩm:</strong> <span id="infoProduct"></span></p>
+    <p><strong>Số tiền:</strong> <span id="infoPrice"></span></p>
+    <p><strong>Ngân hàng:</strong> MB</p>
+    <p><strong>STK:</strong> 07000021112004</p>
+    <p><strong>Chủ TK:</strong> HOANG QUOC VIET</p>
+    <p><strong>Nội dung CK:</strong> <span id="infoNote"></span></p>
+    <button id="getKeyBtn" class="btn btn-success mt-2">Lấy Key</button>
   </div>
 
-  <script>
-    const apiURL = "https://script.google.com/macros/s/AKfycbw1au3_eVXFDjSG250gS1wT5M82416FDH0gserZ1ArIXqwb56WOYEq6IM1QuHJCBu8W/exec";
-    let transferCounter = Math.floor(Math.random() * 10000); // random để giả lập
-    const priceMap = {
-      "24h": "10.000",
-      "7day": "35.000",
-      "30day": "150.000"
-    };
+  <div class="alert alert-info mt-3 d-none text-center" id="keyResult"></div>
+</div>
 
-    document.getElementById("orderForm").addEventListener("submit", function(e) {
-      e.preventDefault();
-      const form = new FormData(e.target);
-      const game = form.get("game");
-      const duration = form.get("duration");
+<script>
+  const apiURL = "https://script.google.com/macros/s/AKfycbxoJmmyUgNVDrRGhVst6dbTVEWhJOwBPydpUx5sLbz5r3HjHj_f7CNlGLqVAWGlCERz/exec";
+  let counter = Math.floor(Math.random() * 1000);
 
-      const gameMap = {
-        "lienquan": "Liên Quân Mobile",
-        "pubg": "PUBG Mobile",
-        "playtogether": "Play Together VNG"
-      };
+  const priceMap = {
+    "24h": "10.000",
+    "7day": "35.000",
+    "30day": "150.000"
+  };
 
-      const durationMap = {
-        "24h": "24 giờ",
-        "7day": "7 ngày",
-        "30day": "30 ngày"
-      };
+  document.getElementById("orderForm").addEventListener("submit", function (e) {
+    e.preventDefault();
+    const game = document.getElementById("game").value;
+    const duration = document.getElementById("duration").value;
 
-      transferCounter++;
-      const transferCode = "NAP" + transferCounter;
-      const price = priceMap[duration];
+    counter++;
+    const transferNote = "NAP" + counter;
 
-      document.getElementById("summaryProduct").innerText = `${durationMap[duration]} | ${gameMap[game]}`;
-      document.getElementById("transferNote").innerText = transferCode;
-      document.getElementById("summaryPrice").innerText = price;
+    document.getElementById("infoProduct").textContent = `${duration} - ${game}`;
+    document.getElementById("infoPrice").textContent = `${priceMap[duration]} VNĐ`;
+    document.getElementById("infoNote").textContent = transferNote;
+    document.getElementById("paymentSection").classList.remove("d-none");
+    window.scrollTo({ top: document.body.scrollHeight, behavior: "smooth" });
+  });
 
-      document.getElementById("paymentInfo").classList.remove("d-none");
-      window.scrollTo({ top: document.body.scrollHeight, behavior: "smooth" });
-    });
+  document.getElementById("getKeyBtn").addEventListener("click", async () => {
+    const duration = document.getElementById("duration").value;
+    const keyBox = document.getElementById("keyResult");
 
-    document.getElementById("getKeyBtn").addEventListener("click", async () => {
-      const duration = document.getElementById("duration").value;
+    try {
+      const res = await fetch(`${apiURL}?type=xuat&time=${duration}`);
+      const data = await res.json();
 
-      try {
-        const res = await fetch(`${apiURL}?type=xuat&time=${duration}`);
-        const data = await res.json();
-
-        if (data.status === "success") {
-          document.getElementById("keyResult").classList.remove("d-none");
-          document.getElementById("keyResult").innerText = `🎉 Key của bạn: ${data.key}`;
-        } else {
-          throw new Error(data.message || "Không lấy được key");
-        }
-      } catch (err) {
-        document.getElementById("keyResult").classList.remove("d-none");
-        document.getElementById("keyResult").classList.replace("alert-info", "alert-danger");
-        document.getElementById("keyResult").innerText = `Lỗi lấy key: ${err.message}`;
+      if (data.status === "success") {
+        keyBox.textContent = `🎉 Key của bạn: ${data.key}`;
+        keyBox.classList.remove("d-none", "alert-danger");
+        keyBox.classList.add("alert-info");
+      } else {
+        throw new Error(data.message);
       }
-    });
-  </script>
+    } catch (err) {
+      keyBox.textContent = `Lỗi lấy key: ${err.message}`;
+      keyBox.classList.remove("d-none", "alert-info");
+      keyBox.classList.add("alert-danger");
+    }
+  });
+</script>
 </body>
 </html>
