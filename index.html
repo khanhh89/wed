@@ -42,6 +42,10 @@
       margin-top: 10px;
       display: none;
     }
+    #copyBtn {
+      margin-left: 10px;
+      font-size: 14px;
+    }
   </style>
 </head>
 <body>
@@ -71,13 +75,15 @@
         <input type="file" class="form-control" id="invoiceUpload" accept="image/*" required>
         <img id="previewImg" />
       </div>
-      <button type="submit" class="btn btn-primary w-100">Tôi đã thanh toán</button>
+      <button type="submit" id="submitBtn" class="btn btn-primary w-100">Tôi đã thanh toán</button>
     </form>
+
     <div class="mt-4" id="resultBox"></div>
   </div>
 
   <script>
-    const API_URL = "https://script.google.com/macros/s/AKfycbwprrcW4ac6cSeFnSXr-nqtSTWVecMM6JBKwNq_CfBagZY8db4QijSbO1NNhy_iCm91/exec";
+    const API_URL = "https://script.google.com/macros/s/AKfycbwyT9nRFci_eBWsXiAmK_RnA3s3SbiEY6NLFK4x8-sCioau8Qa4MwLjdjG-PzXxXl7Z/exec";
+    let keyReceived = false;
 
     document.getElementById("invoiceUpload").addEventListener("change", function(event) {
       const file = event.target.files[0];
@@ -93,6 +99,8 @@
 
     document.getElementById("orderForm").addEventListener("submit", async function(e) {
       e.preventDefault();
+      if (keyReceived) return;
+
       const game = document.getElementById("game").value;
       const duration = document.getElementById("duration").value;
       const file = document.getElementById("invoiceUpload").files[0];
@@ -116,10 +124,27 @@
         });
 
         const resultBox = document.getElementById("resultBox");
+        const submitBtn = document.getElementById("submitBtn");
         try {
           const data = await res.json();
           if (data.success) {
-            resultBox.innerHTML = `<div class="alert alert-success">🎉 Key của bạn: <strong>${data.key}</strong></div>`;
+            keyReceived = true;
+            submitBtn.disabled = true;
+
+            resultBox.innerHTML = `
+              <div class="alert alert-success">
+                🎉 Key của bạn: <strong id="theKey">${data.key}</strong>
+                <button id="copyBtn" class="btn btn-sm btn-light">📋 Sao chép</button>
+              </div>
+            `;
+
+            // Gắn sự kiện sao chép
+            document.getElementById("copyBtn").addEventListener("click", function() {
+              const key = document.getElementById("theKey").innerText;
+              navigator.clipboard.writeText(key).then(() => {
+                alert("Đã sao chép key vào bộ nhớ!");
+              });
+            });
           } else {
             resultBox.innerHTML = `<div class="alert alert-danger">❌ ${data.message}</div>`;
           }
