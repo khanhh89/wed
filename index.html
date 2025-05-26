@@ -12,7 +12,7 @@
       font-family: 'Segoe UI', sans-serif;
     }
     .container {
-      max-width: 500px;
+      max-width: 550px;
       margin: auto;
       margin-top: 30px;
       padding: 20px;
@@ -42,9 +42,12 @@
       margin-top: 10px;
       display: none;
     }
-    #copyBtn {
+    #copyBtn, .copy-btn {
       margin-left: 10px;
       font-size: 14px;
+    }
+    .alert-success strong {
+      font-size: 18px;
     }
   </style>
 </head>
@@ -70,6 +73,21 @@
           <option value="30day">30 ngày - 150.000đ</option>
         </select>
       </div>
+
+      <div id="paymentBox" style="display:none;" class="mb-4">
+        <hr />
+        <h5>💳 Thông tin thanh toán</h5>
+        <p><strong>👤 Chủ TK:</strong> HOANG QUOC VIET</p>
+        <p><strong>🏦 STK:</strong> <span id="stk">07000021112004</span>
+          <button class="btn btn-sm btn-success copy-btn" onclick="copyText('07000021112004')">Copy</button>
+        </p>
+        <p><strong>💰 Số tiền:</strong> <span id="amount">--</span></p>
+        <p><strong>📝 Nội dung:</strong> <span id="note">NAP1001</span>
+          <button class="btn btn-sm btn-success copy-btn" onclick="copyText(document.getElementById('note').innerText)">Copy</button>
+        </p>
+        <p><strong>🛒 Sản phẩm:</strong> <span id="product">--</span></p>
+      </div>
+
       <div class="mb-3">
         <label class="form-label">Tải ảnh xác nhận thanh toán</label>
         <input type="file" class="form-control" id="invoiceUpload" accept="image/*" required>
@@ -84,6 +102,19 @@
   <script>
     const API_URL = "https://script.google.com/macros/s/AKfycbwprrcW4ac6cSeFnSXr-nqtSTWVecMM6JBKwNq_CfBagZY8db4QijSbO1NNhy_iCm91/exec";
     let keyReceived = false;
+    let counter = 1001;
+
+    const priceMap = {
+      "1day": "10.000 VNĐ",
+      "7day": "35.000 VNĐ",
+      "30day": "150.000 VNĐ"
+    };
+
+    const durationText = {
+      "1day": "1 ngày",
+      "7day": "7 ngày",
+      "30day": "30 ngày"
+    };
 
     document.getElementById("invoiceUpload").addEventListener("change", function(event) {
       const file = event.target.files[0];
@@ -106,9 +137,19 @@
       const file = document.getElementById("invoiceUpload").files[0];
 
       if (!game || !duration || !file) {
-        alert("Vui lòng điền đầy đủ thông tin và upload ảnh.");
+        alert("Vui lòng chọn game, thời hạn và upload ảnh.");
         return;
       }
+
+      counter++;
+      const note = "NAP" + counter;
+      const product = `${durationText[duration]} | ${game}`;
+      const amount = priceMap[duration];
+
+      document.getElementById("note").innerText = note;
+      document.getElementById("product").innerText = product;
+      document.getElementById("amount").innerText = amount;
+      document.getElementById("paymentBox").style.display = "block";
 
       const reader = new FileReader();
       reader.onload = async function(event) {
@@ -116,6 +157,7 @@
         const formData = new FormData();
         formData.append("game", game);
         formData.append("duration", duration);
+        formData.append("note", note);
         formData.append("image", imageBase64);
 
         const res = await fetch(API_URL, {
@@ -137,8 +179,6 @@
                 <button id="copyBtn" class="btn btn-sm btn-light">📋 Sao chép</button>
               </div>
             `;
-
-            // Gắn sự kiện sao chép
             document.getElementById("copyBtn").addEventListener("click", function() {
               const key = document.getElementById("theKey").innerText;
               navigator.clipboard.writeText(key).then(() => {
@@ -154,6 +194,10 @@
       };
       reader.readAsDataURL(file);
     });
+
+    function copyText(text) {
+      navigator.clipboard.writeText(text).then(() => alert("Đã sao chép: " + text));
+    }
   </script>
 </body>
 </html>
