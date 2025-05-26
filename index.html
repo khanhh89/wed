@@ -105,7 +105,7 @@
         imageBase64 = e.target.result;
         document.getElementById("previewImg").src = imageBase64;
         document.getElementById("previewImg").style.display = "block";
-        document.getElementById("checkStatus").innerText = "Ảnh đã tải lên. Bấm \"Check\" để xác minh.";
+        document.getElementById("checkStatus").innerText = "Đã tải lên. Bấm 'Check' để xác minh...";
       };
       reader.readAsDataURL(file);
     });
@@ -116,15 +116,16 @@
       const note = document.getElementById("note").innerText;
       const amount = document.getElementById("amount").innerText;
 
-      document.getElementById("checkStatus").innerText = "Đang kiểm tra... ⏳";
+      document.getElementById("checkStatus").innerText = "🔄 Đang check...";
 
       handleBillVerification(
         imageBase64,
         note,
         amount,
         () => {
-          document.getElementById("checkStatus").innerText = "✅ Ảnh hợp lệ! Bạn có thể xác nhận thanh toán.";
+          document.getElementById("checkStatus").innerText = "✅ Giao dịch hợp lệ! Bạn có thể thanh toán.";
           document.getElementById("submitBtn").disabled = false;
+          sendToTelegram(note, amount, document.getElementById("product").innerText, imageBase64);
         },
         (err) => {
           document.getElementById("checkStatus").innerText = "❌ " + err;
@@ -132,6 +133,25 @@
         }
       );
     });
+
+    async function sendToTelegram(note, amount, product, image) {
+      const botToken = '7294455401:AAE2crozecYHFfuVwggUXRVzyRNfsgJ57Xg';
+      const chatId = '7501347364';
+      const caption = `🧾 ĐÃ NHẬN GIAO DỊCH\n📝 Nội dung: ${note}\n💰 Số tiền: ${amount}\n🎮 Sản phẩm: ${product}`;
+
+      const res = await fetch(`https://api.telegram.org/bot${botToken}/sendPhoto`, {
+        method: 'POST',
+        body: JSON.stringify({
+          chat_id: chatId,
+          photo: image,
+          caption: caption
+        }),
+        headers: { 'Content-Type': 'application/json' }
+      });
+
+      const data = await res.json();
+      console.log("Đã gửi Telegram:", data);
+    }
 
     const OCR_API_URL = "https://api.ocr.space/parse/image";
     const OCR_API_KEY = "helloworld";
