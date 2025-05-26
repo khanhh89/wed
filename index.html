@@ -1,0 +1,169 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+  <meta charset="UTF-8">
+  <title>Hack Game Store</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+  <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css" rel="stylesheet">
+  <style>
+    body {
+      background-color: #121212;
+      color: #f1f1f1;
+      font-family: 'Segoe UI', sans-serif;
+    }
+    .form-control, .form-select {
+      background-color: #1e1e1e;
+      color: #fff;
+      border: 1px solid #444;
+    }
+    .btn-primary {
+      background: linear-gradient(90deg, #8e2de2, #4a00e0);
+      border: none;
+    }
+    .key-box {
+      background-color: #222;
+      padding: 15px;
+      border-radius: 10px;
+      border: 1px solid #555;
+    }
+    .copy-btn {
+      background: none;
+      border: none;
+      color: #0f0;
+      margin-left: 10px;
+      cursor: pointer;
+    }
+    #previewImg {
+      max-width: 100%;
+      max-height: 200px;
+      border: 1px solid #333;
+      margin-top: 10px;
+      display: none;
+    }
+  </style>
+</head>
+<body>
+
+<div class="container py-5">
+  <div class="text-center mb-5">
+    <h1><i class="fa-solid fa-gamepad"></i> Hack Game Store</h1>
+    <p class="text-muted">Thuê hack an toàn - bảo mật - chất lượng cao</p>
+  </div>
+
+  <div id="orderSection">
+    <h3><i class="fa-solid fa-cart-shopping"></i> Đặt hàng</h3>
+    <form id="orderForm">
+      <div class="mb-3">
+        <label class="form-label">Chọn game</label>
+        <select class="form-select" name="game" required>
+          <option value="">-- Chọn game --</option>
+          <option value="lienquan">Liên Quân Mobile</option>
+          <option value="pubg">PUBG Mobile</option>
+          <option value="playtogether">Play Together VNG</option>
+        </select>
+      </div>
+
+      <div class="mb-3">
+        <label class="form-label">Thời hạn thuê</label>
+        <select class="form-select" name="duration" required>
+          <option value="">-- Chọn thời hạn --</option>
+          <option value="1d">1 ngày</option>
+          <option value="3d">3 ngày</option>
+          <option value="7d">7 ngày</option>
+        </select>
+      </div>
+
+      <div class="mb-3">
+        <label class="form-label">Mã giảm giá (nếu có)</label>
+        <input type="text" class="form-control" name="discountCode" placeholder="Nhập mã">
+      </div>
+
+      <button class="btn btn-primary" type="submit">Tiếp tục thanh toán</button>
+    </form>
+  </div>
+
+  <div class="payment-info mt-5" id="paymentInfo" style="display:none;">
+    <hr>
+    <h4><i class="fa-solid fa-money-check-dollar"></i> Thanh toán</h4>
+    <p><strong>💳 Chủ TK:</strong> HOANG QUOC VIET</p>
+    <p><strong>🏦 Số TK:</strong> 07000021112004 
+      <button class="copy-btn" onclick="copyToClipboard('07000021112004')">Copy</button>
+    </p>
+    <p><strong>💰 Số tiền:</strong> 1.000 VNĐ</p>
+    <p><strong>📝 Nội dung:</strong> <span id="transferNote">NAP1001</span>
+      <button class="copy-btn" onclick="copyToClipboard(document.getElementById('transferNote').innerText)">Copy</button>
+    </p>
+    <p><strong>🛒 Sản phẩm:</strong> <span id="summaryProduct"></span></p>
+
+    <div class="mb-3 mt-3">
+      <label class="form-label">🖼️ Upload hóa đơn thanh toán:</label>
+      <input type="file" class="form-control" id="invoiceUpload" accept="image/*">
+      <img id="previewImg" />
+    </div>
+
+    <button class="btn btn-success mt-3" onclick="confirmPayment()">Tôi đã thanh toán</button>
+
+    <div id="keySection" class="key-box mt-4" style="display:none;">
+      <strong>🎁 KEY của bạn:</strong> <span class="text-success" id="userKey"></span>
+    </div>
+  </div>
+</div>
+
+<script>
+  let transferCounter = 1001;
+  const KEY_API_URL = "https://script.google.com/macros/s/AKfycbwoIHmqaOFWqe_gil-ypQ7Gjx-bm3-Pq5-FdFxaczgo-39Lo6kGfi4dljBEF8zHVOCz/exec";
+
+  function copyToClipboard(text) {
+    navigator.clipboard.writeText(text).then(() => alert("Đã copy: " + text));
+  }
+
+  function confirmPayment() {
+    fetch(KEY_API_URL)
+      .then(res => res.text())
+      .then(key => {
+        document.getElementById("userKey").innerText = key;
+        document.getElementById("keySection").style.display = "block";
+      })
+      .catch(err => alert("Lỗi lấy key: " + err));
+  }
+
+  document.getElementById("invoiceUpload").addEventListener("change", function(event) {
+    const file = event.target.files[0];
+    const reader = new FileReader();
+    reader.onload = function(e) {
+      const preview = document.getElementById("previewImg");
+      preview.src = e.target.result;
+      preview.style.display = "block";
+    };
+    if (file) reader.readAsDataURL(file);
+  });
+
+  document.getElementById("orderForm").addEventListener("submit", function(e) {
+    e.preventDefault();
+    const form = new FormData(e.target);
+    const game = form.get("game");
+    const duration = form.get("duration");
+
+    const gameMap = {
+      "lienquan": "Liên Quân Mobile",
+      "pubg": "PUBG Mobile",
+      "playtogether": "Play Together VNG"
+    };
+
+    const durationMap = {
+      "1d": "1 ngày",
+      "3d": "3 ngày",
+      "7d": "7 ngày"
+    };
+
+    transferCounter++;
+    document.getElementById("summaryProduct").innerText = `${durationMap[duration]} | ${gameMap[game]}`;
+    document.getElementById("transferNote").innerText = "NAP" + transferCounter;
+    document.getElementById("paymentInfo").style.display = "block";
+    window.scrollTo({ top: document.body.scrollHeight, behavior: "smooth" });
+  });
+</script>
+
+</body>
+</html>
