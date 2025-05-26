@@ -51,7 +51,7 @@
           <button class="btn btn-sm btn-success copy-btn" onclick="copyText('07000021112004')">Copy</button>
         </p>
         <p><strong>💰 Số tiền:</strong> <span id="amount">--</span></p>
-        <p><strong>📝 Nội dung:</strong> <span id="note">NAPXXXX</span>
+        <p><strong>📝 Nội dung:</strong> <span id="note">NAP1002</span>
           <button class="btn btn-sm btn-success copy-btn" onclick="copyText(document.getElementById('note').innerText)">Copy</button>
         </p>
         <p><strong>🛒 Sản phẩm:</strong> <span id="product">--</span></p>
@@ -75,11 +75,6 @@
     const durationText = { "1day": "1 ngày", "7day": "7 ngày", "30day": "30 ngày" };
     let imageBase64 = null;
 
-    function generateRandomNote() {
-      const randomNum = Math.floor(100000 + Math.random() * 900000);
-      return "NAP" + randomNum;
-    }
-
     function copyText(text) {
       navigator.clipboard.writeText(text).then(() => alert("Đã sao chép: " + text));
     }
@@ -89,7 +84,7 @@
       const duration = document.getElementById("duration").value;
       if (!game || !duration) return alert("Vui lòng chọn game và thời hạn!");
 
-      const note = generateRandomNote();
+      const note = "NAP1002"; // giữ cố định
       const product = `${durationText[duration]} | ${game}`;
       const amount = priceMap[duration];
 
@@ -112,67 +107,6 @@
       };
       reader.readAsDataURL(file);
     });
-
-    document.getElementById("checkBtn").addEventListener("click", async () => {
-      if (!imageBase64) return alert("Vui lòng tải ảnh hóa đơn trước!");
-
-      const note = document.getElementById("note").innerText;
-      const amount = document.getElementById("amount").innerText;
-
-      document.getElementById("checkStatus").innerText = "🔄 Đang kiểm tra...";
-
-      const text = await extractTextFromImage(imageBase64);
-      const foundNote = findNAPCode(text);
-      const foundAmount = findAmount(text);
-
-      const expectedAmount = amount.replace(/\D/g, '');
-      const normalizedAmount = foundAmount?.replace(/^0+/, '');
-      const normalizedExpected = expectedAmount.replace(/^0+/, '');
-
-      if (foundNote?.toUpperCase() === note.toUpperCase() && normalizedAmount === normalizedExpected) {
-        document.getElementById("checkStatus").innerText = "✅ Giao dịch hợp lệ!";
-        document.getElementById("submitBtn").disabled = false;
-        sendToTelegram(note, amount, document.getElementById("product").innerText, imageBase64);
-      } else {
-        document.getElementById("checkStatus").innerText = `❌ Mã hoặc số tiền không khớp! Tìm thấy: ${foundNote} | ${foundAmount}`;
-      }
-    });
-
-    async function sendToTelegram(note, amount, product, image) {
-      const botToken = '7294455401:AAE2crozecYHFfuVwggUXRVzyRNfsgJ57Xg';
-      const chatId = '7501347364';
-      const caption = `🧾 ĐÃ NHẬN GIAO DỊCH\n📝 Nội dung: ${note}\n💰 Số tiền: ${amount}\n🎮 Sản phẩm: ${product}`;
-
-      await fetch(`https://api.telegram.org/bot${botToken}/sendPhoto`, {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({
-          chat_id: chatId,
-          photo: image,
-          caption
-        })
-      });
-    }
-
-    async function extractTextFromImage(base64Image) {
-      const res = await fetch("https://api.ocr.space/parse/image", {
-        method: "POST",
-        headers: { apikey: "helloworld" },
-        body: new URLSearchParams({ base64Image, language: "vie", isOverlayRequired: "false" })
-      });
-      const result = await res.json();
-      return result?.ParsedResults?.[0]?.ParsedText || "";
-    }
-
-    function findNAPCode(text) {
-      const match = text.match(/NAP\d{3,8}/i);
-      return match ? match[0].toUpperCase() : null;
-    }
-
-    function findAmount(text) {
-      const match = text.match(/(\d{1,3}(?:[\.\,\s]\d{3})+)/);
-      return match ? match[1].replace(/\D/g, '') : null;
-    }
   </script>
 </body>
 </html>
