@@ -42,20 +42,11 @@
       margin-top: 10px;
       display: none;
     }
-    .game-option {
-      display: flex;
-      align-items: center;
-    }
-    .game-option img {
-      width: 24px;
-      height: 24px;
-      margin-right: 10px;
-    }
   </style>
 </head>
 <body>
   <div class="container">
-    <h3 class="text-center mb-4">🕹️ Mua Key Hack Game</h3>
+    <h3 class="text-center mb-4">📌 Mua Key Hack Game</h3>
     <form id="orderForm">
       <div class="mb-3">
         <label class="form-label">Game bạn muốn mua</label>
@@ -63,6 +54,7 @@
           <option value="">-----</option>
           <option value="Play Together VNG">🎮 PLAY TOGETHER VNG</option>
           <option value="Liên Quân Mobile">🔥 Liên Quân Mobile</option>
+          <option value="PUBG Mobile">🔫 PUBG Mobile</option>
         </select>
       </div>
       <div class="mb-3">
@@ -85,8 +77,7 @@
   </div>
 
   <script>
-    const API_URL = "https://script.google.com/macros/s/AKfycbyg0PbrxuVlh1jD21SYa4E569Vuu2bylEU7VsYyDf-y3RDG_KqJSneHOz2kGFY7o_IV/exec";
-    const TELEGRAM_CHAT_ID = "7501347364";
+    const API_URL = "https://script.google.com/macros/s/AKfycbwprrcW4ac6cSeFnSXr-nqtSTWVecMM6JBKwNq_CfBagZY8db4QijSbO1NNhy_iCm91/exec";
 
     document.getElementById("invoiceUpload").addEventListener("change", function(event) {
       const file = event.target.files[0];
@@ -118,7 +109,6 @@
         formData.append("game", game);
         formData.append("duration", duration);
         formData.append("image", imageBase64);
-        formData.append("chat_id", TELEGRAM_CHAT_ID);
 
         const res = await fetch(API_URL, {
           method: "POST",
@@ -134,7 +124,7 @@
             resultBox.innerHTML = `<div class="alert alert-danger">❌ ${data.message}</div>`;
           }
         } catch {
-          resultBox.innerHTML = `<div class="alert alert-danger">❌ Lỗi hệ thống hoặc API!</div>`;
+          resultBox.innerHTML = `<div class="alert alert-danger">❌ Lỗi kết nối đến máy chủ!</div>`;
         }
       };
       reader.readAsDataURL(file);
