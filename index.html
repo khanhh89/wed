@@ -132,7 +132,54 @@
         }
       );
     });
+
+    // Tích hợp OCR trực tiếp tại đây
+    const OCR_API_URL = "https://api.ocr.space/parse/image";
+    const OCR_API_KEY = "helloworld"; // thay bằng API key thật nếu cần
+
+    async function extractTextFromImage(base64Image) {
+      const formData = new FormData();
+      formData.append("base64Image", base64Image);
+      formData.append("language", "vie");
+      formData.append("isOverlayRequired", "false");
+      formData.append("OCREngine", "2");
+
+      const res = await fetch(OCR_API_URL, {
+        method: "POST",
+        headers: { apikey: OCR_API_KEY },
+        body: formData
+      });
+      const result = await res.json();
+      const parsedText = result?.ParsedResults?.[0]?.ParsedText || "";
+      return parsedText;
+    }
+
+    function findNAPCodeAndAmount(text) {
+      const napMatch = text.match(/NAP\d{3,6}/i);
+      const moneyMatch = text.match(/([1-9]\d{2,})(\.000)? ?(VN[DĐ])/i);
+      return {
+        napCode: napMatch ? napMatch[0].toUpperCase() : null,
+        amount: moneyMatch ? parseInt(moneyMatch[1].replace(/\D/g, '')) : null
+      };
+    }
+
+    async function handleBillVerification(imageBase64, expectedNote, expectedAmount, onSuccess, onError) {
+      try {
+        const extractedText = await extractTextFromImage(imageBase64);
+        const { napCode, amount } = findNAPCodeAndAmount(extractedText);
+        console.log("[OCR text]", extractedText);
+        console.log("[Tìm thấy]", napCode, amount);
+        const expectedAmountNum = parseInt(expectedAmount.replace(/\D/g, ''));
+        if (napCode === expectedNote && amount === expectedAmountNum) {
+          onSuccess();
+        } else {
+          onError("Mã hoặc số tiền không khớp! Tìm thấy: " + napCode + " | " + amount);
+        }
+      } catch (err) {
+        console.error("OCR ERROR:", err);
+        onError("Lỗi kết nối hoặc xử lý ảnh!");
+      }
+    }
   </script>
-  <script src="ocr.js"></script>
 </body>
 </html>
