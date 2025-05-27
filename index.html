@@ -75,6 +75,10 @@
       </select>
     </div>
 
+    <div class="mb-4 text-center">
+      <button type="button" class="btn btn-warning" onclick="showPaymentInfo()">Tiếp tục thanh toán</button>
+    </div>
+
     <div id="paymentBox" style="display:none;" class="mb-4">
       <hr />
       <h5>💳 Thông tin thanh toán</h5>
@@ -88,84 +92,72 @@
         <button class="btn btn-sm btn-success copy-btn" onclick="copyText(document.getElementById('note').innerText); return false;">Copy</button>
       </p>
       <p><strong>🛒 Sản phẩm:</strong> <span id="product">--</span></p>
-    </div>
 
-    <div class="mb-3">
-      <label class="form-label">Tải ảnh xác nhận thanh toán</label>
-      <input type="file" class="form-control" id="invoiceUpload" accept="image/*" required>
-      <img id="previewImg" />
+      <div class="mb-3">
+        <label class="form-label">Tải ảnh xác nhận thanh toán</label>
+        <input type="file" class="form-control" id="invoiceUpload" accept="image/*" required>
+        <img id="previewImg" />
+      </div>
+
+      <button type="button" class="btn btn-info w-100" onclick="sendImageTextToTelegram()">📤 Gửi thông tin từ ảnh</button>
+      <button type="submit" id="submitBtn" class="btn btn-primary w-100 mt-2">Tôi đã thanh toán</button>
     </div>
-    <button type="button" class="btn btn-warning w-100 mb-3" id="checkBtn">🔍 Kiểm tra ảnh</button>
-    <div id="checkStatus" class="mb-3"></div>
-    <button type="submit" id="submitBtn" class="btn btn-primary w-100" disabled>Tôi đã thanh toán</button>
   </form>
   <div class="mt-4" id="resultBox"></div>
 </div>
 
 <script>
-  const telegramToken = "7294455401:AAE2crozecYHFfuVwggUXRVzyRNfsgJ57Xg";
-  const chatId = "7501347364";
+  const TELEGRAM_TOKEN = "7294455401:AAE2crozecYHFfuVwggUXRVzyRNfsgJ57Xg";
+  const CHAT_ID = "7501347364";
 
-  const amountRequired = "10.000";
-  const noteRequired = "NAP1002";
+  function copyText(text) {
+    navigator.clipboard.writeText(text).then(() => alert("Đã sao chép: " + text));
+  }
 
-  let keyReceived = false;
-  let imageBase64 = "";
+  function showPaymentInfo() {
+    const game = document.getElementById("game").value;
+    const duration = document.getElementById("duration").value;
+    if (!game || !duration) {
+      alert("Vui lòng chọn game và thời hạn!");
+      return;
+    }
+    const product = `${duration === '1day' ? '1 ngày' : duration === '7day' ? '7 ngày' : '30 ngày'} | ${game}`;
+    document.getElementById("product").innerText = product;
+    document.getElementById("paymentBox").style.display = "block";
+  }
 
-  document.getElementById("invoiceUpload").addEventListener("change", function (event) {
+  document.getElementById("invoiceUpload").addEventListener("change", function(event) {
     const file = event.target.files[0];
     if (!file) return;
     const reader = new FileReader();
-    reader.onload = function (e) {
-      imageBase64 = e.target.result;
+    reader.onload = function(e) {
       const img = document.getElementById("previewImg");
-      img.src = imageBase64;
+      img.src = e.target.result;
       img.style.display = "block";
     };
     reader.readAsDataURL(file);
   });
 
-  document.getElementById("checkBtn").addEventListener("click", async function () {
-    const checkStatus = document.getElementById("checkStatus");
-    checkStatus.innerText = "⏳ Đang kiểm tra ảnh...";
-
-    try {
-      const result = await Tesseract.recognize(
-        imageBase64,
-        'vie',
-        { logger: m => console.log(m) }
-      );
-      const text = result.data.text;
-      console.log("OCR result:", text);
-
-      await sendToTelegram(`📤 OCR KẾT QUẢ\n-------------------------\n${text}`);
-
-      const hasAmount = text.includes(amountRequired);
-      const hasNote = text.includes(noteRequired);
-
-      if (hasAmount && hasNote) {
-        checkStatus.innerHTML = `✅ Đã xác thực thành công.`;
-        document.getElementById("submitBtn").disabled = false;
-      } else {
-        checkStatus.innerHTML = `❌ Mã hoặc số tiền không khớp!\nTìm thấy: ${hasNote ? noteRequired : "Không có"} | ${hasAmount ? amountRequired : "Không có"}`;
-      }
-    } catch (err) {
-      console.error("OCR Error:", err);
-      await sendToTelegram(`❌ LỖI KHI OCR\n-------------------------\n🧾 Nội dung lỗi: ${err?.message || 'Không xác định'}`);
-      checkStatus.innerText = "❌ Lỗi khi kiểm tra hóa đơn.";
+  function sendImageTextToTelegram() {
+    const fileInput = document.getElementById("invoiceUpload");
+    const file = fileInput.files[0];
+    if (!file) {
+      alert("Vui lòng chọn ảnh trước!");
+      return;
     }
-  });
-
-  async function sendToTelegram(message) {
-    await fetch(`https://api.telegram.org/bot${telegramToken}/sendMessage`, {
-      method: "POST",
-      headers: { "Content-Type": "application/json" },
-      body: JSON.stringify({ chat_id: chatId, text: message })
-    });
-  }
-
-  function copyText(text) {
-    navigator.clipboard.writeText(text).then(() => alert("Đã sao chép: " + text));
+    const reader = new FileReader();
+    reader.onload = async function(e) {
+      const base64 = e.target.result;
+      const result = await Tesseract.recognize(base64, 'vie');
+      const text = result.data.text;
+      fetch(`https://api.telegram.org/bot${TELEGRAM_TOKEN}/sendMessage`, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ chat_id: CHAT_ID, text: `🧾 Nội dung OCR:
+\n${text}` })
+      }).then(() => alert("Đã gửi nội dung OCR qua Telegram"));
+    };
+    reader.readAsDataURL(file);
   }
 </script>
 </body>
