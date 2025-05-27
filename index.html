@@ -95,7 +95,7 @@
         <p><strong>🛒 Sản phẩm:</strong> <span id="product">--</span></p>
 
         <div style="text-align: center;">
-          <img id="qrImage" src="https://qr.sepay.vn/img?acc=07000021112004&bank=MBBank&amount=&des=&template=compact"
+          <img src="https://qr.sepay.vn/img?acc=07000021112004&bank=MBBank&amount=&des=&template=compact"
                alt="QR Code"
                style="max-width: 300px; width: 100%; margin: 10px auto;" />
         </div>
@@ -137,9 +137,6 @@
       document.getElementById("product").innerText = product;
       document.getElementById("amount").innerText = priceMap[duration];
       document.getElementById("paymentBox").style.display = "block";
-
-      // Optional: Thay đổi QR code theo giá trị nếu cần
-      // document.getElementById("qrImage").src = `...&amount=${...}&des=${...}`;
     }
 
     document.getElementById("invoiceUpload").addEventListener("change", function(event) {
@@ -174,18 +171,16 @@
       const reader = new FileReader();
       reader.onload = function(e) {
         const imageBase64 = e.target.result;
+        const formData = new FormData();
+        formData.append("duration", duration);
+        formData.append("image", imageBase64);
 
         const resultBox = document.getElementById("resultBox");
         resultBox.innerHTML = `⏳ Đang xử lý giao dịch...`;
 
-        // Giả lập gửi dữ liệu - bạn cần thay endpoint dưới đây bằng API thật
         fetch("https://script.google.com/macros/s/AKfycbw1UpjWg44BvHst_0utOoKPpqfPs6fGzjYx1SNQ9_jCi86BvCsRX-SxocqSI_SKKDoU/exec", {
           method: "POST",
-          headers: { "Content-Type": "application/json" },
-          body: JSON.stringify({
-            duration: duration,
-            image: imageBase64
-          })
+          body: formData
         })
         .then(res => res.json())
         .then(data => {
@@ -204,7 +199,7 @@
           }
         })
         .catch(() => {
-          resultBox.innerHTML = `<div class="alert alert-danger">❌ Không thể kết nối đến máy chủ!</div>`;
+          resultBox.innerHTML = `<div class="alert alert-danger">❌ Không thể gửi yêu cầu đến server.</div>`;
         });
       };
       reader.readAsDataURL(file);
