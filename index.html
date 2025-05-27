@@ -69,8 +69,8 @@
         <select class="form-select" id="duration" required>
           <option value="">-----</option>
           <option value="1day">1 ngày - 10.000đ</option>
-          <option value="7day">7 ngày - 35.000đ</option>
-          <option value="30day">30 ngày - 150.000đ</option>
+          <option value="7day">7 ngày - 39.000đ</option>
+          <option value="30day">30 ngày - 129.000đ</option>
         </select>
       </div>
 
@@ -94,12 +94,11 @@
         </p>
         <p><strong>🛒 Sản phẩm:</strong> <span id="product">--</span></p>
 
-	<div style="text-align: center;">
-  <img src="https://qr.sepay.vn/img?acc=07000021112004&bank=MBBank&amount=&des=&template=compact"
-       alt="QR Code"
-       style="max-width: 300px; width: 100%;" />
-</div>
-
+        <div style="text-align: center;">
+          <img src="https://qr.sepay.vn/img?acc=07000021112004&bank=MBBank&amount=&des=&template=compact"
+               alt="QR Code"
+               style="max-width: 300px; width: 100%; margin: 10px auto;" />
+        </div>
 
         <div class="mb-3">
           <label class="form-label">Tải ảnh xác nhận thanh toán</label>
@@ -111,7 +110,7 @@
         </div>
 
         <div class="mt-3 text-center">
-          <button type="button" class="btn btn-primary" onclick="confirmPayment()">✅ Xác nhận giao dịch thành công</button>
+          <button type="button" class="btn btn-primary" id="confirmBtn" onclick="confirmPayment()">✅ Xác nhận giao dịch thành công</button>
         </div>
 
         <div id="resultBox" class="mt-3 text-center"></div>
@@ -121,8 +120,7 @@
 
   <script>
     function copyText(text) {
-      navigator.clipboard.writeText(text)
-        .then(() => alert("📋 Đã sao chép: " + text));
+      navigator.clipboard.writeText(text).then(() => alert("📋 Đã sao chép: " + text));
     }
 
     function showPaymentInfo() {
@@ -134,7 +132,7 @@
       }
 
       const product = `${duration === '1day' ? '1 ngày' : duration === '7day' ? '7 ngày' : '30 ngày'} | ${game}`;
-      const priceMap = { '1day': '10.000 VNĐ', '7day': '35.000 VNĐ', '30day': '150.000 VNĐ' };
+      const priceMap = { '1day': '10.000 VNĐ', '7day': '39.000 VNĐ', '30day': '129.000 VNĐ' };
 
       document.getElementById("product").innerText = product;
       document.getElementById("amount").innerText = priceMap[duration];
@@ -153,7 +151,14 @@
       reader.readAsDataURL(file);
     });
 
+    let paymentConfirmed = false;
+
     function confirmPayment() {
+      if (paymentConfirmed) {
+        alert("⚠️ Bạn đã xác nhận và nhận key rồi!");
+        return;
+      }
+
       const duration = document.getElementById("duration").value;
       const imageInput = document.getElementById("invoiceUpload");
       const file = imageInput.files[0];
@@ -180,6 +185,9 @@
         .then(res => res.json())
         .then(data => {
           if (data.success && data.key) {
+            paymentConfirmed = true;
+            document.getElementById("confirmBtn").disabled = true;
+
             resultBox.innerHTML = `
               <div class="alert alert-success">
                 🎉 Key của bạn: <strong id="theKey">${data.key}</strong>
