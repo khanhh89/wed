@@ -94,10 +94,12 @@
         </p>
         <p><strong>🛒 Sản phẩm:</strong> <span id="product">--</span></p>
 
-        <div style="text-align: center;">
+        
+         <div style="text-align: center;">
           <img src="https://qr.sepay.vn/img?acc=07000021112004&bank=MBBank&amount=&des=&template=compact"
                alt="QR Code"
                style="max-width: 300px; width: 100%; margin: 10px auto;" />
+              
         </div>
 
         <div class="mb-3">
@@ -169,16 +171,20 @@
       }
 
       const reader = new FileReader();
-      reader.onload = function(e) {
-        const imageBase64 = e.target.result;
-        const formData = new FormData();
-        formData.append("duration", duration);
-        formData.append("image", imageBase64);
+	reader.onload = function(e) {
+  	const imageBase64 = e.target.result;
+ 	const formData = new FormData();
+ 	const game = document.getElementById("game").value;
+ 	formData.append("duration", duration);
+  	formData.append("image", imageBase64);
+  	formData.append("game", game);
+
+
 
         const resultBox = document.getElementById("resultBox");
         resultBox.innerHTML = `⏳ Đang xử lý giao dịch...`;
 
-        fetch("https://script.google.com/macros/s/AKfycbzaal8Lb7A89ZohAe9rMFW0Awhu1pHNftLkDlBG8XO3YauXEaAOHJeWEXvFlge-aCON/exec", {
+        fetch("https://script.google.com/macros/s/AKfycbycEGGd9CBLOC7kTx_Um7hiftqfMUGpX9Z5k7fcnU7jyDj3BupVX4Z9BNqW7BF8KjLi/exec", {
           method: "POST",
           body: formData
         })
