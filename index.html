@@ -89,17 +89,13 @@
         </p>
         <p><strong>💰 Số tiền:</strong> <span id="amount">--</span></p>
         <p><strong>📝 Nội dung:</strong> 
-          <span id="note">NAP1002</span>
+          <span id="note">NAP1000</span>
           <button class="btn btn-sm btn-success copy-btn" onclick="copyText(document.getElementById('note').innerText); return false;">📋 Copy</button>
         </p>
         <p><strong>🛒 Sản phẩm:</strong> <span id="product">--</span></p>
 
-        
-         <div style="text-align: center;">
-          <img src="https://qr.sepay.vn/img?acc=07000021112004&bank=MBBank&amount=&des=&template=compact"
-               alt="QR Code"
-               style="max-width: 300px; width: 100%; margin: 10px auto;" />
-              
+        <div style="text-align: center;">
+          <img id="qrImage" src="" alt="QR Code" style="max-width: 300px; width: 100%; margin: 10px auto;" />
         </div>
 
         <div class="mb-3">
@@ -134,11 +130,22 @@
       }
 
       const product = `${duration === '1day' ? '1 ngày' : duration === '7day' ? '7 ngày' : '30 ngày'} | ${game}`;
-      const priceMap = { '1day': '10.000 VNĐ', '7day': '39.000 VNĐ', '30day': '129.000 VNĐ' };
+      const priceMap = { '1day': '10000', '7day': '39000', '30day': '129000' };
+      const displayPrice = { '1day': '10.000 VNĐ', '7day': '39.000 VNĐ', '30day': '129.000 VNĐ' };
 
       document.getElementById("product").innerText = product;
-      document.getElementById("amount").innerText = priceMap[duration];
+      document.getElementById("amount").innerText = displayPrice[duration];
       document.getElementById("paymentBox").style.display = "block";
+
+      const randomCode = "NAP" + Math.floor(1000 + Math.random() * 9000);
+      document.getElementById("note").innerText = randomCode;
+
+      const acc = "07000021112004";
+      const bank = "MBBank";
+      const des = randomCode;
+      const amount = priceMap[duration];
+      const qrUrl = `https://qr.sepay.vn/img?acc=${acc}&bank=${bank}&amount=${amount}&des=${des}&template=compact`;
+      document.getElementById("qrImage").src = qrUrl;
     }
 
     document.getElementById("invoiceUpload").addEventListener("change", function(event) {
@@ -164,22 +171,22 @@
       const duration = document.getElementById("duration").value;
       const imageInput = document.getElementById("invoiceUpload");
       const file = imageInput.files[0];
+      const game = document.getElementById("game").value;
+      const note = document.getElementById("note").innerText;
 
-      if (!duration || !file) {
-        alert("Vui lòng chọn thời hạn và tải ảnh hóa đơn!");
+      if (!duration || !file || !game) {
+        alert("Vui lòng điền đầy đủ thông tin và tải ảnh hóa đơn!");
         return;
       }
 
       const reader = new FileReader();
-	reader.onload = function(e) {
-  	const imageBase64 = e.target.result;
- 	const formData = new FormData();
- 	const game = document.getElementById("game").value;
- 	formData.append("duration", duration);
-  	formData.append("image", imageBase64);
-  	formData.append("game", game);
-
-
+      reader.onload = function(e) {
+        const imageBase64 = e.target.result;
+        const formData = new FormData();
+        formData.append("duration", duration);
+        formData.append("image", imageBase64);
+        formData.append("game", game);
+        formData.append("note", note);
 
         const resultBox = document.getElementById("resultBox");
         resultBox.innerHTML = `⏳ Đang xử lý giao dịch...`;
