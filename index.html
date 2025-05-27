@@ -173,7 +173,7 @@
       const file = imageInput.files[0];
       const game = document.getElementById("game").value;
       const note = document.getElementById("note").innerText;
-
+   
       if (!duration || !file || !game) {
         alert("Vui lòng điền đầy đủ thông tin và tải ảnh hóa đơn!");
         return;
@@ -187,11 +187,15 @@
         formData.append("image", imageBase64);
         formData.append("game", game);
         formData.append("note", note);
+	const priceMap = { '1day': '10000', '7day': '39000', '30day': '129000' };
+  	const amount = priceMap[duration]; 
+  	formData.append("amount", amount); // ✅ Gửi thêm giá trị số tiền
+	
 
         const resultBox = document.getElementById("resultBox");
         resultBox.innerHTML = `⏳ Đang xử lý giao dịch...`;
 
-        fetch("https://script.google.com/macros/s/AKfycbycEGGd9CBLOC7kTx_Um7hiftqfMUGpX9Z5k7fcnU7jyDj3BupVX4Z9BNqW7BF8KjLi/exec", {
+        fetch("https://script.google.com/macros/s/AKfycbxpTW01X9tqhcWB4kisVwo8tB-zgPtvteHZc39x0jp3dUlJQU1I8wmHwnMmFycyX5OH/exec", {
           method: "POST",
           body: formData
         })
