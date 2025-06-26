@@ -74,12 +74,10 @@
           <option value="30day">30 ngày - 129.000đ</option>
         </select>
       </div>
-	    <div class="mb-3">
-  <label class="form-label">🎁 Mã giảm giá (nếu có)</label>
-  <input type="text" class="form-control" id="discountCode" placeholder="Nhập mã giảm giá...">
-</div>
-
-
+      <div class="mb-3">
+        <label class="form-label">🎁 Mã giảm giá (nếu có)</label>
+        <input type="text" class="form-control" id="discountCode" placeholder="Nhập mã giảm giá...">
+      </div>
       <div class="mb-4 text-center">
         <button type="button" class="btn btn-warning" onclick="showPaymentInfo()">Tiếp tục thanh toán</button>
       </div>
@@ -123,35 +121,56 @@
   </div>
 
   <script>
+    let paymentConfirmed = false;
+    let currentFinalAmount = null;
+
     function copyText(text) {
       navigator.clipboard.writeText(text).then(() => alert("📋 Đã sao chép: " + text));
     }
 
     function showPaymentInfo() {
+      currentFinalAmount = null;
       const game = document.getElementById("game").value;
       const duration = document.getElementById("duration").value;
+      const discountCode = document.getElementById("discountCode").value.trim();
       if (!game || !duration) {
         alert("Vui lòng chọn game và thời hạn!");
         return;
       }
 
-      const product = `${duration === '1day' ? '1 ngày' : duration === '7day' ? '7 ngày' : '30 ngày'} | ${game}`;
-      const priceMap = { '1day': '10000', '7day': '39000', '30day': '129000' };
-      const displayPrice = { '1day': '10.000 VNĐ', '7day': '39.000 VNĐ', '30day': '129.000 VNĐ' };
-
-      document.getElementById("product").innerText = product;
-      document.getElementById("amount").innerText = displayPrice[duration];
-      document.getElementById("paymentBox").style.display = "block";
-
-      const randomCode = "HQV" + Math.floor(1000 + Math.random() * 9999);
+      const priceMap = { '1day': 10000, '7day': 39000, '30day': 129000 };
+      const displayTextMap = { '1day': '1 ngày', '7day': '7 ngày', '30day': '30 ngày' };
+      const originalAmount = priceMap[duration];
+      const product = `${displayTextMap[duration]} | ${game}`;
+      const randomCode = "HQV" + Math.floor(1000 + Math.random() * 9000);
       document.getElementById("note").innerText = randomCode;
+      document.getElementById("product").innerText = product;
 
-      const acc = "07000021112004";
-      const bank = "MBBank";
-      const des = randomCode;
-      const amount = priceMap[duration];
-      const qrUrl = `https://qr.sepay.vn/img?acc=${acc}&bank=${bank}&amount=${amount}&des=${des}&template=compact`;
-      document.getElementById("qrImage").src = qrUrl;
+      const url = `https://script.google.com/macros/s/AKfycbxf7Cs0mAUebO_qNw31MfPFjdLHY42EDBWr64tGHIdCA1h2C86mRK4WjF97Ksaq8lMu/exec?duration=${duration}&discountCode=${discountCode}&amount=${originalAmount}`;
+
+      fetch(url)
+        .then(res => res.json())
+        .then(data => {
+          const finalAmount = data.actualPay || originalAmount;
+          currentFinalAmount = finalAmount;
+          const displayAmount = finalAmount.toLocaleString('vi-VN') + " VNĐ";
+          document.getElementById("amount").innerText = displayAmount;
+
+          const qrUrl = `https://qr.sepay.vn/img?acc=07000021112004&bank=MBBank&amount=${finalAmount}&des=${randomCode}&template=compact`;
+          document.getElementById("qrImage").src = qrUrl;
+
+          document.getElementById("paymentBox").style.display = "block";
+        })
+        .catch(() => {
+          alert("Không thể áp mã giảm giá! Sử dụng số tiền gốc.");
+          const displayAmount = originalAmount.toLocaleString('vi-VN') + " VNĐ";
+          document.getElementById("amount").innerText = displayAmount;
+
+          const qrUrl = `https://qr.sepay.vn/img?acc=07000021112004&bank=MBBank&amount=${originalAmount}&des=${randomCode}&template=compact`;
+          document.getElementById("qrImage").src = qrUrl;
+
+          document.getElementById("paymentBox").style.display = "block";
+        });
     }
 
     document.getElementById("invoiceUpload").addEventListener("change", function(event) {
@@ -166,8 +185,6 @@
       reader.readAsDataURL(file);
     });
 
-    let paymentConfirmed = false;
-
     function confirmPayment() {
       if (paymentConfirmed) {
         alert("⚠️ Bạn đã xác nhận và nhận key rồi!");
@@ -179,7 +196,7 @@
       const file = imageInput.files[0];
       const game = document.getElementById("game").value;
       const note = document.getElementById("note").innerText;
-   
+
       if (!duration || !file || !game) {
         alert("Vui lòng điền đầy đủ thông tin và tải ảnh hóa đơn!");
         return;
@@ -193,24 +210,26 @@
         formData.append("image", imageBase64);
         formData.append("game", game);
         formData.append("note", note);
-	const priceMap = { '1day': '10000', '7day': '39000', '30day': '129000' };
-  	const amount = priceMap[duration]; 
-  	formData.append("amount", amount); // ✅ Gửi thêm giá trị số tiền
-	
+        formData.append("discountCode", document.getElementById("discountCode").value);
+
+        const amountToSend = currentFinalAmount || { '1day': 10000, '7day': 39000, '30day': 129000 }[duration];
+        formData.append("amount", amountToSend);
 
         const resultBox = document.getElementById("resultBox");
         resultBox.innerHTML = `⏳ Đang xử lý giao dịch...`;
 
-        fetch("https://script.google.com/macros/s/AKfycbxpTW01X9tqhcWB4kisVwo8tB-zgPtvteHZc39x0jp3dUlJQU1I8wmHwnMmFycyX5OH/exec", {
+        fetch("https://script.google.com/macros/s/AKfycbxf7Cs0mAUebO_qNw31MfPFjdLHY42EDBWr64tGHIdCA1h2C86mRK4WjF97Ksaq8lMu/exec", {
           method: "POST",
           body: formData
         })
         .then(res => res.json())
         .then(data => {
+          document.getElementById("amount").innerText = data.finalAmount.toLocaleString('vi-VN') + " VNĐ";
+          document.getElementById("qrImage").src = `https://qr.sepay.vn/img?acc=07000021112004&bank=MBBank&amount=${data.finalAmount}&des=${note}&template=compact`;
+
           if (data.success && data.key) {
             paymentConfirmed = true;
             document.getElementById("confirmBtn").disabled = true;
-
             resultBox.innerHTML = `
               <div class="alert alert-success">
                 🎉 Key của bạn: <strong id="theKey">${data.key}</strong>
