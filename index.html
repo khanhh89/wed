@@ -146,7 +146,7 @@
       document.getElementById("note").innerText = randomCode;
       document.getElementById("product").innerText = product;
 
-      const url = `https://script.google.com/macros/s/AKfycbxf7Cs0mAUebO_qNw31MfPFjdLHY42EDBWr64tGHIdCA1h2C86mRK4WjF97Ksaq8lMu/exec?duration=${duration}&discountCode=${discountCode}&amount=${originalAmount}`;
+      const url = `https://script.google.com/macros/s/AKfycbzEoCrgEBrdj4D_cCZIWi_QJJIE5EuB_CNmvGkXV2tQquaF2xh1NNTWzUuyrnitX5uc/exec?duration=${duration}&discountCode=${discountCode}&amount=${originalAmount}`;
 
       fetch(url)
         .then(res => res.json())
@@ -218,7 +218,7 @@
         const resultBox = document.getElementById("resultBox");
         resultBox.innerHTML = `⏳ Đang xử lý giao dịch...`;
 
-        fetch("https://script.google.com/macros/s/AKfycbxf7Cs0mAUebO_qNw31MfPFjdLHY42EDBWr64tGHIdCA1h2C86mRK4WjF97Ksaq8lMu/exec", {
+        fetch("https://script.google.com/macros/s/AKfycbzEoCrgEBrdj4D_cCZIWi_QJJIE5EuB_CNmvGkXV2tQquaF2xh1NNTWzUuyrnitX5uc/exec", {
           method: "POST",
           body: formData
         })
