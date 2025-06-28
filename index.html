@@ -103,7 +103,7 @@
         </div>
 
         <div class="mb-3">
-          <label class="form-label">🖼️Tải ảnh xác nhận thanh toán</label>
+          <label class="form-label">🖼️Ảnh xác nhận thanh toán (giảm 100% thì gửi ảnh gái xinh >.<) </label>
           <input type="file" class="form-control" id="invoiceUpload" accept="image/*" required>
         </div>
 
@@ -146,31 +146,33 @@
       document.getElementById("note").innerText = randomCode;
       document.getElementById("product").innerText = product;
 
-      const url = `https://script.google.com/macros/s/AKfycbzMqNjRYuqFQUo2ugOcayG_6os9Ef1vuQzMGq3m39tA5A7A02mDV9jKKVwq10LSK5Uz/exec?duration=${duration}&discountCode=${discountCode}&amount=${originalAmount}`;
+      const url = `https://script.google.com/macros/s/AKfycbw63iu36YhUi62mo_wRqvHILY9cjkKoqt53WpHhzTNqBaUrg43_TleTdrkbhtx_0xVm/exec?duration=${duration}&discountCode=${discountCode}&amount=${originalAmount}`;
 
       fetch(url)
         .then(res => res.json())
         .then(data => {
-    	  const finalAmount = ('actualPay' in data) ? data.actualPay : originalAmount;
-          currentFinalAmount = finalAmount;
-          const displayAmount = finalAmount.toLocaleString('vi-VN') + " VNĐ";
-          document.getElementById("amount").innerText = displayAmount;
+  const finalAmount = ('actualPay' in data) ? data.actualPay : originalAmount;
+  currentFinalAmount = finalAmount;
 
-          const qrUrl = `https://qr.sepay.vn/img?acc=07000021112004&bank=MBBank&amount=${finalAmount}&des=${randomCode}&template=compact`;
-          document.getElementById("qrImage").src = qrUrl;
+  const displayAmount = finalAmount.toLocaleString('vi-VN') + " VNĐ";
+  document.getElementById("amount").innerText = displayAmount;
 
-          document.getElementById("paymentBox").style.display = "block";
-        })
-        .catch(() => {
-          alert("Không thể áp mã giảm giá! Sử dụng số tiền gốc.");
-          const displayAmount = originalAmount.toLocaleString('vi-VN') + " VNĐ";
-          document.getElementById("amount").innerText = displayAmount;
+  const qrUrl = `https://qr.sepay.vn/img?acc=07000021112004&bank=MBBank&amount=${finalAmount}&des=${randomCode}&template=compact`;
+  document.getElementById("qrImage").src = qrUrl;
 
-          const qrUrl = `https://qr.sepay.vn/img?acc=07000021112004&bank=MBBank&amount=${originalAmount}&des=${randomCode}&template=compact`;
-          document.getElementById("qrImage").src = qrUrl;
+  // Hiển thị thông báo trạng thái mã giảm giá cho người mua
+  const resultBox = document.getElementById("resultBox");
+  if (data.message) {
+    resultBox.innerHTML = `
+      <div class="alert ${data.validDiscount ? 'alert-success' : 'alert-warning'}">
+        ${data.message}
+      </div>
+    `;
+  }
 
-          document.getElementById("paymentBox").style.display = "block";
-        });
+  document.getElementById("paymentBox").style.display = "block";
+})
+
     }
 
     document.getElementById("invoiceUpload").addEventListener("change", function(event) {
@@ -218,7 +220,7 @@
         const resultBox = document.getElementById("resultBox");
         resultBox.innerHTML = `⏳ Đang xử lý giao dịch...`;
 
-        fetch("https://script.google.com/macros/s/AKfycbzMqNjRYuqFQUo2ugOcayG_6os9Ef1vuQzMGq3m39tA5A7A02mDV9jKKVwq10LSK5Uz/exec", {
+        fetch("https://script.google.com/macros/s/AKfycbw63iu36YhUi62mo_wRqvHILY9cjkKoqt53WpHhzTNqBaUrg43_TleTdrkbhtx_0xVm/exec", {
           method: "POST",
           body: formData
         })
