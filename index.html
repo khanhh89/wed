@@ -146,12 +146,12 @@
       document.getElementById("note").innerText = randomCode;
       document.getElementById("product").innerText = product;
 
-      const url = `https://script.google.com/macros/s/AKfycbzEoCrgEBrdj4D_cCZIWi_QJJIE5EuB_CNmvGkXV2tQquaF2xh1NNTWzUuyrnitX5uc/exec?duration=${duration}&discountCode=${discountCode}&amount=${originalAmount}`;
+      const url = `https://script.google.com/macros/s/AKfycbzMqNjRYuqFQUo2ugOcayG_6os9Ef1vuQzMGq3m39tA5A7A02mDV9jKKVwq10LSK5Uz/exec?duration=${duration}&discountCode=${discountCode}&amount=${originalAmount}`;
 
       fetch(url)
         .then(res => res.json())
         .then(data => {
-          const finalAmount = data.actualPay || originalAmount;
+    	  const finalAmount = ('actualPay' in data) ? data.actualPay : originalAmount;
           currentFinalAmount = finalAmount;
           const displayAmount = finalAmount.toLocaleString('vi-VN') + " VNĐ";
           document.getElementById("amount").innerText = displayAmount;
@@ -212,13 +212,13 @@
         formData.append("note", note);
         formData.append("discountCode", document.getElementById("discountCode").value);
 
-        const amountToSend = currentFinalAmount || { '1day': 10000, '7day': 39000, '30day': 129000 }[duration];
+        const amountToSend = (typeof currentFinalAmount === 'number') ? currentFinalAmount : { '1day': 10000, '7day': 39000, '30day': 129000 }[duration];
         formData.append("amount", amountToSend);
 
         const resultBox = document.getElementById("resultBox");
         resultBox.innerHTML = `⏳ Đang xử lý giao dịch...`;
 
-        fetch("https://script.google.com/macros/s/AKfycbzEoCrgEBrdj4D_cCZIWi_QJJIE5EuB_CNmvGkXV2tQquaF2xh1NNTWzUuyrnitX5uc/exec", {
+        fetch("https://script.google.com/macros/s/AKfycbzMqNjRYuqFQUo2ugOcayG_6os9Ef1vuQzMGq3m39tA5A7A02mDV9jKKVwq10LSK5Uz/exec", {
           method: "POST",
           body: formData
         })
