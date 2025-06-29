@@ -55,7 +55,7 @@ function showPaymentInfo() {
   document.getElementById("note").innerText = randomCode;
   document.getElementById("product").innerText = product;
 
-  const url = `https://script.google.com/macros/s/AKfycbyCBqmlGsJBGTh1RZuhptke2dxyu-jE82DCi8xzc1rzwyE6DiE24PEhF7H1XWY4WLX1/exec?duration=${duration}&discountCode=${discountCode}&amount=${originalAmount}`;
+  const url = `https://script.google.com/macros/s/AKfycbyAE8TGsEWW6dbnYTIC9dtmcldDoRshLZfe_xIbVWTmlkLe3Z0tBL7400evHYNWYfoI/exec?duration=${duration}&discountCode=${discountCode}&amount=${originalAmount}`;
 
   console.log("Sending GET request:", url); // Debug URL
 
