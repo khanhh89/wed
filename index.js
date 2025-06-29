@@ -156,7 +156,7 @@ function confirmPayment() {
     const resultBox = document.getElementById("resultBox");
     resultBox.innerHTML = `⏳ Đang xử lý giao dịch...`;
 
-    fetch("https://script.google.com/macros/s/AKfycbyCBqmlGsJBGTh1RZuhptke2dxyu-jE82DCi8xzc1rzwyE6DiE24PEhF7H1XWY4WLX1/exec", {
+    fetch("https://script.google.com/macros/s/AKfycbyAE8TGsEWW6dbnYTIC9dtmcldDoRshLZfe_xIbVWTmlkLe3Z0tBL7400evHYNWYfoI/exec", {
       method: "POST",
       body: formData
     })
